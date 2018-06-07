@@ -6,10 +6,19 @@
 	objectVersion = 50;
 	objects = {
 
+/* Begin PBXFileReference section */
+		04357D0A20C9843D00DD650D /* web_convert_HTML.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = web_convert_HTML.py; sourceTree = "<group>"; };
+		04357D0B20C9843D00DD650D /* filter_HTML.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = filter_HTML.py; sourceTree = "<group>"; };
+		04357D0C20C9843D00DD650D /* reduce.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = reduce.py; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
 /* Begin PBXGroup section */
 		0414E56020BED65200FBBF67 = {
 			isa = PBXGroup;
 			children = (
+				04357D0B20C9843D00DD650D /* filter_HTML.py */,
+				04357D0C20C9843D00DD650D /* reduce.py */,
+				04357D0A20C9843D00DD650D /* web_convert_HTML.py */,
 			);
 			sourceTree = "<group>";
 		};
