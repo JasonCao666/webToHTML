@@ -1,6 +1,7 @@
 import sys
 import string
 import csv
+csv.field_size_limit(500 * 1024 * 1024)
 
 #remove BOM
 def removeBom(file):
@@ -26,6 +27,14 @@ def dicHasValue(word, cor_value):
             return True
     return False
 
+def createDictCSV(fileName="", dataDict={}):
+    with open(fileName, "wb") as csvFile:
+        csvWriter = csv.writer(csvFile)
+        for k,v in dataDict.iteritems():
+            csvWriter.writerow([k,v])
+        csvFile.close()
+
+index=0
 word_locations=[]
 current_id=None
 word_and_location={}
@@ -43,7 +52,6 @@ with open('/Users/mac/Documents/Dissertation/documents/wordLocation.csv','rb') a
                     continue
                 else:
                     word_and_location[file_row['word']]=str(word_and_location[file_row['word']])+str(file_row['coordination'])+' '
-        
             else:
                 word_and_location[file_row['word']]=str(file_row['coordination'])+' '
         elif current_id != None and file_row['id']!=current_id:
@@ -62,5 +70,6 @@ with open('/Users/mac/Documents/Dissertation/documents/wordLocation.csv','rb') a
             word_and_location['location'] = file_row['coordination']+' '''
 
 print word_and_location
-
+output_file_name='/Users/mac/Documents/Dissertation/documents/collection_result.csv'
+createDictCSV(output_file_name, word_and_location)
 

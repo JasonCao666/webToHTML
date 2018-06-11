@@ -62,7 +62,6 @@ with open('/Users/mac/Documents/Dissertation/documents/coordination.csv','rb') a
     for coordination in reader_coordination:
         if coordination['city']!='':
             coordination['coordination']=coordination['coordination'].replace(' ','')
-            print coordination['coordination']
             list_coordination.append(coordination)
     csv_coordination.close
 
