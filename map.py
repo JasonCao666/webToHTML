@@ -2,11 +2,15 @@ from mpl_toolkits.basemap import Basemap
 import numpy as np
 import matplotlib.pyplot as plt
 
-m = Basemap(width=8E6,height=8E6,projection='lcc',
-            resolution=None,lat_1=48, lat_2=50, lat_0=51.51279,lon_0=-0.09184)
+map = Basemap(llcrnrlon=-11.1,
+              llcrnrlat=50.0,
+              urcrnrlon=2.64,
+              urcrnrlat=58.79,
+              resolution='h', projection='lcc', width=8E6, height=8E6, lat_0 =-2.16 ,lon_0=53.87)
 # draw a land-sea mask for a map background.
 # lakes=True means plot inland lakes with ocean color.
-m.drawlsmask(land_color='coral',ocean_color='aqua',lakes=True)
+map.drawlsmask(land_color='coral',ocean_color='aqua',lakes=True)
+map.drawcoastlines()
 plt.show()
 
 
