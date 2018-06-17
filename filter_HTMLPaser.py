@@ -1,4 +1,4 @@
-
+#coding:utf-8
 import csv
 import re
 import sys
@@ -6,8 +6,11 @@ import os
 import pandas as pd
 from HTMLParser import HTMLParser
 reload(sys)
-sys.setdefaultencoding("utf-8")
+sys.setdefaultencoding('utf8')
 csv.field_size_limit(500 * 1024 * 1024)
+
+global filted_result_list
+filted_result_list=[]
 
 #remove BOM
 def removeBom(file):
@@ -23,23 +26,79 @@ def removeBom(file):
 
 
 
-
 class MyHTMLParser(HTMLParser):
     
+    def setIdCoordination(self, id, coordination):
+        self.id=id
+        self.coordination=coordination
+        self.tags=[]
+        self.testList=['script', 'style', 'link', 'head', 'a', 'title']
+        self.result_row=[]
+    
+    
     def handle_starttag(self, tag, attrs):
-        if tag!='script' and tag!='head' and tag!='link' and tag!='p' and tag!='meta' and tag!='style' and tag!='a':
-            print("Encountered a start tag:", tag)
-
-    def handle_data(self, data):
-        if len(data)<100 and len(data)>1:
-            print("Encountered some data  :", data)
-            return data
+        self.tags.append(tag)
+        #print self.tags
+        #print("Encountered a start tag:", tag)
+        #tags.push(tag)
+        #print("Encountered a start tag:", tag)
+    
+    
     
     def handle_endtag(self, tag):
-        if tag!='script' and tag!='head' and tag!='link' and tag!='p' and tag!='meta' and tag!='style' and tag!='a':
-            print("Encountered a end tag:", tag)
+        self.tags.pop()
+        #print("Encountered a end tag:", tag)
     
-    
+    def handle_data(self, data):
+        if len(self.tags)==0:
+            return
+        if self.tags[-1] in self.testList:
+            return
+        else:
+            global filted_result_list
+            #print 'tagname: '+self.tags[-1]
+            re_newline = re.compile('\n')
+            re_space = re.compile('\t')
+            re_HTML_numbers=re.compile(r'[0-9]')
+            re_HTML_tag1=re.compile(r'^.*£.*$')
+            re_HTML_sambols=re.compile(r',|\.|\(|\)|\:|-|–|\"|\+|\'|\!|\?|\*')
+            re_HTML_sambol1=re.compile(r'\/')
+            re_HTML_tag2=re.compile(r'^.*@.*$')
+            re_HTML_tag3=re.compile(r'^.*www.*$')
+            
+            data=re_HTML_numbers.sub('',data)
+            data=re_HTML_tag1.sub('',data)
+            data=re_HTML_tag2.sub('',data)
+            data=re_HTML_tag3.sub('',data)
+            data=re_HTML_sambols.sub('',data)
+            data=re_HTML_sambol1.sub(' ',data)
+            data=re_newline.sub('',data)
+            data=re_space.sub('',data)
+            
+            split_result=data.split()
+            for j in range(len(split_result)):
+                self.result_row=[]
+                
+                if len(split_result[j])>1 and split_result[j]!=' ':
+                    re_HTML_space1=re.compile(r'​​')
+                    re_HTML_connectors=re.compile(r'^and$|^or$|^with$|^the$|^to$|^of$|^in$|^is$|^if$|^by$|^pm$|^am$|^from$|^for$|^between$|^day$|^with$|^opening$|^open$|only|^see$|^still$|^order$|^orders$|^on$|^as$|^at$|^brfore$|^be$|^are$|^take$|^away$|^get$|^can$|^but$|^an$|^any$|^about$|^all$|^when$|^has$|^more$|^lots$|^also$')
+                    re_HTML_personal=re.compile(r'^you$|^your$|^we$|^our$|^this$|^that$|^other$|^please$|^own$|^it$|^its$|^us$|^there$|^here$')
+                    
+                    
+                    split_result[j]=split_result[j].lower()
+                    split_result[j]=re_HTML_space1.sub('',split_result[j])
+                    split_result[j]=re_HTML_connectors.sub('',split_result[j])
+                    split_result[j]=re_HTML_personal.sub('',split_result[j])
+                    if split_result[j]!='':
+                        self.result_row.append(self.id)
+                        self.result_row.append(self.coordination)
+                        self.result_row.append(str(split_result[j]).replace('\xc2\xa0', '').replace('\xe2\x80\xa6', ' ').replace('\xf0\x9f\xa4\x97','').replace('\xe2\x80\x8b','').replace('\xc2\xa9','').replace('\xc3\xabt','').replace('\xc3\xa9ed','').replace('\xe2\x80\x99re','').replace('\xe2\x80\x99ll','').replace('\xe2\x80\x99s',''))
+                        filted_result_list.append(self.result_row)
+
+    #if tags.tail() in ['sctipt', 'style' ...]:
+#return
+#print("Encountered some data  :", data)
+
     
     '''def handle_startendtag(self, tag, attrs):
        
@@ -58,7 +117,8 @@ class MyHTMLParser(HTMLParser):
             print("Encountered comment :", data)'''
 
 input_list=[]
-input_filename = '/Users/mac/Documents/Dissertation/documents/test_HTML_filename.csv'
+#input_filename = '/Users/mac/Documents/Dissertation/documents/test_HTML_filename.csv'
+input_filename = '/Users/mac/Documents/Dissertation/testDocument/test_HTML_filename.csv'
 removeBom(input_filename)
 with open(input_filename,'rb') as csv_input:
     reader_input = csv.DictReader(csv_input,delimiter=',')
@@ -71,17 +131,34 @@ with open(input_filename,'rb') as csv_input:
             input_list.append(input_ids_coordination)
 csv_input.close
 
-parser = MyHTMLParser()
-filted_result_list=[]
-path='/Users/mac/Documents/Dissertation/HTML/'
+
+
+#path='/Users/mac/Documents/Dissertation/HTML/'
+path='/Users/mac/Documents/Dissertation/testDocument/HTML/'
 for input_row in input_list:
-    filter_result=[]
-    filter_result.append(input_row[0])
-    filter_result.append(input_row[1])
     with open(path+input_row[2],'rb') as csv_HTML:
         HTML_reader = csv.DictReader(csv_HTML,delimiter=',')
         for HTML_content in HTML_reader:
-            print parser.feed(str(HTML_content['HTML_content']))
+            parser = MyHTMLParser()
+            parser.setIdCoordination(str(input_row[0]),str(input_row[1]))
+            parser.feed(str(HTML_content['HTML_content']))
 
+print filted_result_list
+
+#if file exist, delete
+#output_filename = '/Users/mac/Documents/Dissertation/documents/wordLocation.csv'
+output_filename = '/Users/mac/Documents/Dissertation/testDocument/wordLocation.csv'
+if os.path.exists(output_filename):
+    os.remove(output_filename)
+
+#write result into wordLocation.csv
+headers = ['id', 'coordination', 'word']
+with open(output_filename,'wb') as output_file:
+    csvWriter = csv.writer(output_file)
+    csvWriter.writerow(headers)
+    for data in filted_result_list:
+        if data[2]!='':
+            csvWriter.writerow(data)
+output_file.close
 
 

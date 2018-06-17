@@ -8,7 +8,8 @@ import os
 import re
 
 reload(sys)
-sys.setdefaultencoding("utf-8")
+sys.setdefaultencoding('utf8')
+
 
 #remove BOM
 def removeBom(file):
@@ -70,8 +71,10 @@ with open('/Users/mac/Documents/Dissertation/documents/coordination.csv','rb') a
 list_rows=[]
 index=0;
 HTML_id_websites=[]
-removeBom('/Users/mac/Documents/Dissertation/documents/London.csv')
-with open('/Users/mac/Documents/Dissertation/documents/London.csv','rb') as csvfile:
+#websites_file_name='/Users/mac/Documents/Dissertation/documents/London.csv'
+websites_file_name='/Users/mac/Documents/Dissertation/testDocument/London.csv'
+removeBom(websites_file_name)
+with open(websites_file_name,'rb') as csvfile:
     reader = csv.DictReader(csvfile,delimiter=',')
     for row in reader:
         result_row = []
@@ -89,13 +92,16 @@ with open('/Users/mac/Documents/Dissertation/documents/London.csv','rb') as csvf
             index=index+1
             list_rows.append(result_row)
             HTML_id_websites.append(id_website_content)
+
     csvfile.close
 #print index
+
 print len(list_rows[0])
 
 
 #if file exist, delete
-filename = '/Users/mac/Documents/Dissertation/documents/test_HTML_filename.csv'
+#filename = '/Users/mac/Documents/Dissertation/documents/test_HTML_filename.csv'
+filename = '/Users/mac/Documents/Dissertation/testDocument/test_HTML_filename.csv'
 if os.path.exists(filename):
     os.remove(filename)
 
@@ -110,14 +116,14 @@ with open(filename,'wb') as final_file:
     final_file.close
 
 for H_content in HTML_id_websites:
-    HTML_content_filename = '/Users/mac/Documents/Dissertation/HTML/'+H_content[0]
+    HTML_content_filename = '/Users/mac/Documents/Dissertation/testDocument/HTML/'+H_content[0]
     if os.path.exists(HTML_content_filename):
         os.remove(HTML_content_filename)
 
 #write HTML content into seperate files
 header = ['HTML_content']
 for H_content in HTML_id_websites:
-    HTML_content_filename = '/Users/mac/Documents/Dissertation/HTML/'+H_content[0]
+    HTML_content_filename = '/Users/mac/Documents/Dissertation/testDocument/HTML/'+H_content[0]
     with open(HTML_content_filename,'wb') as HTML_result_file:
         csvWriter = csv.writer(HTML_result_file)
         csvWriter.writerow(header)

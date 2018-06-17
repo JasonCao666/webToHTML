@@ -37,38 +37,43 @@ def createDictCSV(fileName="", dataDict={}):
 
 index=0
 word_locations=[]
-current_id=None
+current_id=''
+current_word=''
 word_and_location={}
+ids=[]
 #input_file='/Users/mac/Documents/Dissertation/documents/wordLocation.csv'
-input_file='/Users/mac/Documents/Dissertation/testDocument/wordLocation.csv'
+input_file='/Users/mac/Documents/Dissertation/testDocument/wordLocationTest.csv'
 removeBom(input_file)
 with open(input_file,'rb') as csv_HTML:
     reader_file = csv.DictReader(csv_HTML,delimiter=',')
     for file_row in reader_file:
-        if current_id == None:
-            current_id = file_row['id']
-            word_and_location={}
-            word_and_location[file_row['word']]=str(file_row['coordination'])+' '
-        elif current_id != None and file_row['id']==current_id:
-            if wordExist(file_row['word']):
-                if dicHasValue(word_and_location[file_row['word']], str(file_row['coordination'])):
-                    word_and_location[file_row['word']]=str(word_and_location[file_row['word']])+str(file_row['coordination'])+' '
-                #print file_row['word']+' '+word_and_location[file_row['word']]
+        if current_word!=file_row['word']:
+            current_word=file_row['word']
+            ids=[]
+            if file_row['id'] in ids:
                 continue
             else:
-                word_and_location[file_row['word']]=str(file_row['coordination'])+' '
-        elif current_id != None and file_row['id']!=current_id:
-            #print 'currentId: '+ current_id + 'fileId: '+  file_row['id']
-            current_id=file_row['id']
-            if wordExist(file_row['word']):
-                word_and_location[file_row['word']]=str(word_and_location[file_row['word']])+str(file_row['coordination'])+' '
-            #print file_row['word']
+                ids.append(file_row['id'])
+                if wordExist(file_row['word']):
+                    word_and_location[file_row['word']]=str(word_and_location[file_row['word']])+str(file_row['coordination'])+' '
+                else:
+                    word_and_location[file_row['word']]=str(file_row['coordination'])+' '
+        else:
+            print ids
+            if file_row['id'] in ids:
+                continue
             else:
-                word_and_location[file_row['word']]=str(file_row['coordination'])+' '
+                ids.append(file_row['id'])
+                
+                if wordExist(file_row['word']):
+                    word_and_location[file_row['word']]=str(word_and_location[file_row['word']])+str(file_row['coordination'])+' '
+                else:
+                    word_and_location[file_row['word']]=str(file_row['coordination'])+' '
 
 #print word_and_location
 #output_file_name='/Users/mac/Documents/Dissertation/documents/collection_result.csv'
 output_file_name='/Users/mac/Documents/Dissertation/testDocument/collection_result.csv'
 print word_and_location
 createDictCSV(output_file_name, word_and_location)
+
 
