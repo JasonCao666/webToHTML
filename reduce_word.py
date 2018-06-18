@@ -1,6 +1,7 @@
 import sys
 import string
 import csv
+import os
 csv.field_size_limit(500 * 1024 * 1024)
 
 #remove BOM
@@ -41,8 +42,8 @@ current_id=''
 current_word=''
 word_and_location={}
 ids=[]
-#input_file='/Users/mac/Documents/Dissertation/documents/wordLocation.csv'
-input_file='/Users/mac/Documents/Dissertation/testDocument/wordLocationTest.csv'
+input_file='/Users/mac/Documents/Dissertation/documents/wordLocationSorted.csv'
+#input_file='/Users/mac/Documents/Dissertation/testDocument/wordLocationTest.csv'
 removeBom(input_file)
 with open(input_file,'rb') as csv_HTML:
     reader_file = csv.DictReader(csv_HTML,delimiter=',')
@@ -59,7 +60,6 @@ with open(input_file,'rb') as csv_HTML:
                 else:
                     word_and_location[file_row['word']]=str(file_row['coordination'])+' '
         else:
-            print ids
             if file_row['id'] in ids:
                 continue
             else:
@@ -71,9 +71,12 @@ with open(input_file,'rb') as csv_HTML:
                     word_and_location[file_row['word']]=str(file_row['coordination'])+' '
 
 #print word_and_location
-#output_file_name='/Users/mac/Documents/Dissertation/documents/collection_result.csv'
-output_file_name='/Users/mac/Documents/Dissertation/testDocument/collection_result.csv'
-print word_and_location
+output_file_name='/Users/mac/Documents/Dissertation/documents/collection_result.csv'
+#output_file_name='/Users/mac/Documents/Dissertation/testDocument/collection_result.csv'
+
+if os.path.exists(output_file_name):
+    os.remove(output_file_name)
+
 createDictCSV(output_file_name, word_and_location)
 
 

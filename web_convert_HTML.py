@@ -71,8 +71,8 @@ with open('/Users/mac/Documents/Dissertation/documents/coordination.csv','rb') a
 list_rows=[]
 index=0;
 HTML_id_websites=[]
-#websites_file_name='/Users/mac/Documents/Dissertation/documents/London.csv'
-websites_file_name='/Users/mac/Documents/Dissertation/testDocument/London.csv'
+websites_file_name='/Users/mac/Documents/Dissertation/documents/ChipShopMenuURLs.csv'
+#websites_file_name='/Users/mac/Documents/Dissertation/testDocument/London.csv'
 removeBom(websites_file_name)
 with open(websites_file_name,'rb') as csvfile:
     reader = csv.DictReader(csvfile,delimiter=',')
@@ -96,12 +96,11 @@ with open(websites_file_name,'rb') as csvfile:
     csvfile.close
 #print index
 
-print len(list_rows[0])
 
 
 #if file exist, delete
-#filename = '/Users/mac/Documents/Dissertation/documents/test_HTML_filename.csv'
-filename = '/Users/mac/Documents/Dissertation/testDocument/test_HTML_filename.csv'
+filename = '/Users/mac/Documents/Dissertation/documents/test_HTML_filename.csv'
+#filename = '/Users/mac/Documents/Dissertation/testDocument/test_HTML_filename.csv'
 if os.path.exists(filename):
     os.remove(filename)
 
@@ -115,15 +114,17 @@ with open(filename,'wb') as final_file:
         csvWriter.writerow(data)
     final_file.close
 
+#testfile_folder_name='/Users/mac/Documents/Dissertation/testDocument/HTML/'
+output_folder_name='/Users/mac/Documents/Dissertation/HTML/'
 for H_content in HTML_id_websites:
-    HTML_content_filename = '/Users/mac/Documents/Dissertation/testDocument/HTML/'+H_content[0]
+    HTML_content_filename = output_folder_name+H_content[0]
     if os.path.exists(HTML_content_filename):
         os.remove(HTML_content_filename)
 
 #write HTML content into seperate files
 header = ['HTML_content']
 for H_content in HTML_id_websites:
-    HTML_content_filename = '/Users/mac/Documents/Dissertation/testDocument/HTML/'+H_content[0]
+    HTML_content_filename = output_folder_name+H_content[0]
     with open(HTML_content_filename,'wb') as HTML_result_file:
         csvWriter = csv.writer(HTML_result_file)
         csvWriter.writerow(header)
