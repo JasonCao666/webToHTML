@@ -1,4 +1,5 @@
-from math import cos, sin, atan2, sqrt, pi ,radians, degrees, asin, sqrt, fabs
+import math
+#from math import cos, sin, atan2, sqrt, pi ,radians, degrees, asin, sqrt, fabs
 import csv
 from mpl_toolkits.basemap import Basemap
 import numpy as np
@@ -7,6 +8,7 @@ import matplotlib.pyplot as plt
 import csv
 from osgeo import ogr, osr
 
+print radians(3)
 #calculate the central point (specified in decimal degrees)
 def center_geolocation(geolocations):
     
@@ -17,11 +19,11 @@ def center_geolocation(geolocations):
     for row in geolocations:
         lon = radians(float(row.split(',')[0]))
         lat = radians(float(row.split(',')[1]))
-        print 'lon:'+str(lon)+' lat:'+str(lat)
+        
         x += cos(lat) * cos(lon)
         y += cos(lat) * sin(lon)
         z += sin(lat)
-        print 'x: '+str(x)+' y: '+str(y)+' z: '+str(z)
+    
     x = float(x / lenth)
     y = float(y / lenth)
     z = float(z / lenth)
