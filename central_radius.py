@@ -123,7 +123,7 @@ def processDistances():
 
 #read word, coordination file and save values in the list
 word_coor_list=[]
-with open('/Users/mac/Documents/Dissertation/testDocument/haggies.csv','rb') as csv_word_coor:
+with open('/Users/mac/Documents/Dissertation/testDocument/chips.csv','rb') as csv_word_coor:
     reader_word_coors = csv.DictReader(csv_word_coor,delimiter=',')
     for word_coors in reader_word_coors:
         word_coor_dict={}
@@ -192,6 +192,7 @@ if filter_number!=0:
 else:
     r_distance=distances[0]
 
+print 'r=: '+ str(r_distance)
 #draw the central point on the map
 map.plot(central_point_lon,central_point_lat, '-rx', markersize=15)
 
