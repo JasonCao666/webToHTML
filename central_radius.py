@@ -11,9 +11,11 @@ from osgeo import ogr, osr
 global coor_distances
 global coordinations
 global distances
+global city_number
 coor_distances=[]
 coordinations=[]
 distances=[]
+city_number=[]
 
 #calculate the central point (specified in decimal degrees)
 def center_geolocation(geolocations):
@@ -90,6 +92,13 @@ def removeDuplication(one_list):
 #After filter some coordination, update the coordination list
 def updateCoordination():
     global coordinations
+    global coor_distances
+    coordinations=[]
+    for coor_dis_row in coor_distances:
+        coordinations.append(coor_dis_row['coodination'])
+
+'''def updateCoordination():
+    global coordinations
     global distance
     global coor_distances
     coordinations=[]
@@ -97,7 +106,7 @@ def updateCoordination():
         if coor_distances[i]['distance'] in distances:
             coordinations.append(coor_distances[i]['coodination'])
         else:
-            continue
+            continue'''
 
 #calculate basemap central point's longitude and latitude
 def calculateCentralPoint(coordinations_row):
@@ -114,16 +123,28 @@ def updateDistances(central_point_lon,central_point_lat):
     for coor_row in coordinations:
         map_p1,map_p2=map(float(coor_row.split(',')[1]),float(coor_row.split(',')[0]))
         distances.append(getDistanceBetweenTwoPoints(central_point_lon,central_point_lat,map_p1,map_p2))
+
 #remove duplicate and sort distance
 def processDistances():
     global distances
     distances = removeDuplication(distances)
     distances = sorted(distances,reverse = True)
-    print distances
+
+#calculate the number of shop
+def calculateShopNumber():
+    global city_number
+    city_number=[]
+    myset = set(coordinations)
+    for item in myset:
+        city_number_dic={}
+        #print 'the '+str(item)+' has found'+ str(coordinations.count(item))
+        city_number_dic[item]=coordinations.count(item)
+        city_number.append(city_number_dic)
+
 
 #read word, coordination file and save values in the list
 word_coor_list=[]
-with open('/Users/mac/Documents/Dissertation/testDocument/chips.csv','rb') as csv_word_coor:
+with open('/Users/mac/Documents/Dissertation/testDocument/haggies.csv','rb') as csv_word_coor:
     reader_word_coors = csv.DictReader(csv_word_coor,delimiter=',')
     for word_coors in reader_word_coors:
         word_coor_dict={}
@@ -146,40 +167,129 @@ map.drawcountries()
 
 #split the coordinations from string
 for word_coor_row in word_coor_list:
-    coordinations.append(word_coor_row['coordinations'].split())
+    coordinations=word_coor_row['coordinations'].split()
 
-print coordinations
 
 #get basemap central point
-central_point_lon,central_point_lat=calculateCentralPoint(coordinations[0])
+central_point_lon,central_point_lat=calculateCentralPoint(coordinations)
 print 'before filter central point:'+str(central_point_lon)+' '+str(central_point_lat)
 
 #create longi and lati list for cities and the list of coor_distances and distances
+
+for coor_row in coordinations:
+    c_d={}
+    
+    map_p1,map_p2=map(float(coor_row.split(',')[1]),float(coor_row.split(',')[0]))
+    c_d['coodination']=coor_row
+    c_d['distance']=getDistanceBetweenTwoPoints(central_point_lon,central_point_lat,map_p1,map_p2)
+    coor_distances.append(c_d)
+    distances.append(getDistanceBetweenTwoPoints(central_point_lon,central_point_lat,map_p1,map_p2))
+
+calculateShopNumber()
+
+#read word, coordination file and save values in the list (cities)
+city_list=[]
+with open('/Users/mac/Documents/Dissertation/documents/ChipShopMenuURLs.csv','rb') as csv_cities:
+    reader_cities = csv.DictReader(csv_cities,delimiter=',')
+    for cities in reader_cities:
+        if cities['Town']!='':
+            city_list.append(cities['Town'])
+    csv_word_coor.close
+
+#(city, number) 38
+citySet = set(city_list)
+city_count_list=[]
+for item in citySet:
+    city_total_dic={}
+    city_total_dic[item]=city_list.count(item)
+    city_count_list.append(city_total_dic)
+
+
+#load coordination csv file (city,coordination)
+all_city_coordination_list=[]
+with open('/Users/mac/Documents/Dissertation/documents/coordination.csv','rb') as csv_coordination:
+    reader_city_coordination = csv.DictReader(csv_coordination,delimiter=',')
+    for city_coordination in reader_city_coordination:
+        city_coordination_dic={}
+        if city_coordination['city']!='':
+            city_coordination_dic['city']=city_coordination['city']
+            city_coordination_dic['coordination']=city_coordination['coordination'].replace(' ','')
+            all_city_coordination_list.append(city_coordination_dic)
+    csv_coordination.close
+
+
+
+#get coordination and total shop number in a city (coordiantion, totalnumber)
+coordination_total_city_number=[]
+for city_toal_count in city_count_list:
+    coor_total_dic={}
+    for city_coor in all_city_coordination_list:
+        for key, value in city_toal_count.items():
+            if key == city_coor['city']:
+                coor_total_dic['coordination']=city_coor['coordination']
+                coor_total_dic['totalCount']=value
+                coordination_total_city_number.append(coor_total_dic)
+                break
+
+print city_number
+print coordination_total_city_number
+
+
+p_size=[]
+#calculate percentage of a word in a city
+for city_word_count in city_number:
+    for city_total_shop_count in coordination_total_city_number:
+        for key, value in city_word_count.items():
+            if key == city_total_shop_count['coordination']:
+                p_size.append(round(float(value)/float(city_total_shop_count['totalCount']),2))
+                break
+
+print p_size
+
 city_lons=[]
 city_lats=[]
-for coor_row in coordinations:
-    for word_row in coor_row:
-        c_d={}
-        city_lons.append(float(word_row.split(',')[1]))
-        city_lats.append(float(word_row.split(',')[0]))
-        map_p1,map_p2=map(float(word_row.split(',')[1]),float(word_row.split(',')[0]))
-        c_d['coodination']=word_row
-        c_d['distance']=getDistanceBetweenTwoPoints(central_point_lon,central_point_lat,map_p1,map_p2)
-        coor_distances.append(c_d)
-        distances.append(getDistanceBetweenTwoPoints(central_point_lon,central_point_lat,map_p1,map_p2))
+circle_size=[]
+for c_z in city_number:
+    for key, value in c_z.items():
+        city_lons.append(float(key.split(',')[1]))
+        city_lats.append(float(key.split(',')[0]))
+        circle_size.append(value*50)
 
 #plot cities on the map
 x,y = map(city_lons, city_lats)
-map.plot(x, y, 'bo', markersize=5)
+map.scatter(
+          x,
+          y,
+          s=circle_size, #size
+          c='blue', #color
+          marker='o', #symbol
+          alpha=0.25, #transparency
+          zorder = 2, #plotting order
+          )
 
-#remove duplication of coordination and set filter percentage
-processDistances()
-filter_percentage=0.9
-filter_number=math.ceil(len(distances) * (1-filter_percentage))
+for size, xpt, ypt in zip(p_size, x, y):
+    label_txt = float(size) #round to 0 dp and display as integer
+    plt.text(
+             xpt,
+             ypt,
+             label_txt,
+             color = 'yellow',
+             size='small',
+             horizontalalignment='center',
+             verticalalignment='center',
+             zorder = 3,
+             )
+#map.plot(x, y, 'bo', markersize=5)
 
+#calculate filter percentage
+#processDistances()
+filter_percentage=0.95
+filter_number=math.ceil(len(coor_distances) * (1-filter_percentage))
+print 'filter_number: '+str(filter_number)
 #filter some cities which are far from the central point
 print('after filter')
-if filter_number!=0:
+
+'''if filter_number!=0:
     print int(filter_number)
     del distances[0:int(filter_number)]
     print distances
@@ -188,14 +298,25 @@ if filter_number!=0:
     updateDistances(central_point_lon,central_point_lat)
     processDistances()
     r_distance=distances[0]
-    print r_distance
+else:
+    r_distance=distances[0]'''
+
+if filter_number!=0:
+    coor_distances = sorted(coor_distances, key=lambda coor_distances: coor_distances['distance'], reverse = True)
+    del coor_distances[0:int(filter_number)]
+    print coor_distances
+    updateCoordination()
+    print coordinations
+    central_point_lon,central_point_lat=calculateCentralPoint(coordinations)
+    updateDistances(central_point_lon,central_point_lat)
+    processDistances()
+    r_distance=distances[0]
 else:
     r_distance=distances[0]
 
-print 'r=: '+ str(r_distance)
+#print 'r=: '+ str(r_distance)
 #draw the central point on the map
 map.plot(central_point_lon,central_point_lat, '-rx', markersize=15)
-
 
 #draw the range circle on the map
 theta=np.arange(0,2*np.pi, 0.01)
