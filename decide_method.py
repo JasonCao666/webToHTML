@@ -14,6 +14,8 @@ global coordinations
 global previous_coordinations
 global distances
 global city_shop_number
+global original_central_lon
+global original_central_lat
 coor_distances=[]
 coordinations=[]
 distances=[]
@@ -58,8 +60,14 @@ def updateCoordination():
 
 #calculate basemap central point's longitude and latitude
 def calculateCentralPoint(coordinations_row):
+    global original_central_lon
+    global original_central_lat
+    
     central_point=center_geolocation(coordinations_row)
-    print central_point
+   
+    original_central_lon=float(central_point[1])
+    original_central_lat=float(central_point[0])
+    #print str(original_central_lon)+str(original_central_lat)
     central_point_lon,central_point_lat=map(central_point[1],central_point[0])
     return central_point_lon,central_point_lat
 
@@ -67,10 +75,23 @@ def calculateCentralPoint(coordinations_row):
 def updateDistances(central_point_lon,central_point_lat):
     global previous_coordinations
     global distances
+    print str(len(coordinations))+' '+str(len(previous_coordinations))
     distances=[]
     for coor_row in previous_coordinations:
         map_p1,map_p2=map(float(coor_row.split(',')[1]),float(coor_row.split(',')[0]))
         distances.append(getDistanceBetweenTwoPoints(central_point_lon,central_point_lat,map_p1,map_p2))
+
+#get redius
+def getRadius(central_point_lon,central_point_lat):
+    global coordinations
+    r_distances_sort=[]
+    for coors in coordinations:
+        map_p1,map_p2=map(float(coors.split(',')[1]),float(coors.split(',')[0]))
+        r_distances_sort.append(getDistanceBetweenTwoPoints(central_point_lon,central_point_lat,map_p1,map_p2))
+    
+    r_distances_sort = removeDuplication(r_distances_sort)
+    r_distances_sort = sorted(r_distances_sort,reverse = True)
+    return r_distances_sort[0]
 
 #remove duplicate and sort distance
 def processDistances():
@@ -81,11 +102,11 @@ def processDistances():
 def calculateShopNumber():
     global city_shop_number
     city_shop_number=[]
-    myset = set(coordinations)
+    myset = set(previous_coordinations)
     for item in myset:
         city_shop_number_dic={}
         #print 'the '+str(item)+' has found'+ str(coordinations.count(item))
-        city_shop_number_dic[item]=coordinations.count(item)
+        city_shop_number_dic[item]=previous_coordinations.count(item)
         city_shop_number.append(city_shop_number_dic)
 
 #read word, coordination file and save values in the list
@@ -115,7 +136,7 @@ map = Basemap(llcrnrlon=-11.1,
 output_list=[]
 #get basemap central point
 for i in range(len(word_coor_list)):
-    print word_coor_list[i]['word']
+    #print word_coor_list[i]['word']
     distances=[]
     coor_distances=[]
     coordinations=[]
@@ -123,7 +144,7 @@ for i in range(len(word_coor_list)):
     previous_coordinations = word_coor_list[i]['coordinations'].split()
     #print coordinations
     central_point_lon,central_point_lat=calculateCentralPoint(coordinations)
-    print 'before filter central point:'+str(central_point_lon)+' '+str(central_point_lat)
+    #print 'before filter central point:'+str(central_point_lon)+' '+str(central_point_lat)
     
     #create longi and lati list for cities and the list of coor_distances and distances
     for coor_row in coordinations:
@@ -137,19 +158,19 @@ for i in range(len(word_coor_list)):
     #remove duplication of coordination and set filter percentage
     processDistances()
     filter_percentage=0.95
-    filter_number=math.floor(len(coor_distances) * (1-filter_percentage))
+    filter_number=math.ceil(len(coor_distances) * (1-filter_percentage))
     
     #filter some cities which are far from the central point
-    print('after filter')
 
-    if filter_number!=0:
+    if filter_number!=0 and len(coor_distances)!=1:
         coor_distances = sorted(coor_distances, key=lambda coor_distances: coor_distances['distance'], reverse = True)
         del coor_distances[0:int(filter_number)]
         updateCoordination()
+        
         central_point_lon,central_point_lat=calculateCentralPoint(coordinations)
         updateDistances(central_point_lon,central_point_lat)
         processDistances()
-
+    
     calculateShopNumber()
     for city_n in city_shop_number:
         for key,value in city_n.items():
@@ -158,8 +179,11 @@ for i in range(len(word_coor_list)):
             cor1,cor2=map(float(key.split(',')[1]),float(key.split(',')[0]))
             word_score_shops.append(round(getDistanceBetweenTwoPoints(central_point_lon,central_point_lat,cor1,cor2),2))
             word_score_shops.append(value)
+            word_score_shops.append(original_central_lon)
+            word_score_shops.append(original_central_lat)
+            word_score_shops.append(getRadius(central_point_lon,central_point_lat))
             output_list.append(word_score_shops)
-print output_list
+
 
 
 #if file exist, delete
@@ -168,7 +192,7 @@ if os.path.exists(output_filename):
     os.remove(output_filename)
 
 #write result into wordLocation.csv
-headers = ['word', 'score', 'shop_number']
+headers = ['word', 'distance_centre', 'shop_number', 'word_central_lon', 'word_central_lat','radius']
 with open(output_filename,'wb') as output_file:
     csvWriter = csv.writer(output_file)
     csvWriter.writerow(headers)

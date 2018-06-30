@@ -29,8 +29,10 @@ def dicHasValue(word, cor_value):
     return False
 
 def createDictCSV(fileName="", dataDict={}):
+    headers=['word','coordinations']
     with open(fileName, "wb") as csvFile:
         csvWriter = csv.writer(csvFile)
+        csvWriter.writerow(headers)
         for k,v in dataDict.iteritems():
             if k!='':
                 csvWriter.writerow([k,v])

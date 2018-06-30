@@ -146,14 +146,14 @@ for input_row in input_list:
 
 re_encode=re.compile(r'\\([a-zA-Z0-9]){3}')  
 filted_result_list =  eval(re_encode.sub('',str(filted_result_list)))
-for i in range(len(filted_result_list)):
+'''for i in range(len(filted_result_list)):
     if filted_result_list[i][2]!='':
         a,b= nltk.pos_tag([filted_result_list[i][2]])[0]
         matchNN = re.match( r'^NN.*', b)
         if matchNN:
             continue
         else:
-            filted_result_list[i][2]=''
+            filted_result_list[i][2]='' '''
 #print type(re_encode.sub('',str(filted_result_list)))
 #print re_encode.sub('',str(filted_result_list))
 
