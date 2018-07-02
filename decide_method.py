@@ -161,12 +161,11 @@ for i in range(len(word_coor_list)):
     filter_number=math.ceil(len(coor_distances) * (1-filter_percentage))
     
     #filter some cities which are far from the central point
-
-    if filter_number!=0 and len(coor_distances)!=1:
+    
+    if filter_number!=0 and len(set(coordinations))>3:
         coor_distances = sorted(coor_distances, key=lambda coor_distances: coor_distances['distance'], reverse = True)
         del coor_distances[0:int(filter_number)]
         updateCoordination()
-        
         central_point_lon,central_point_lat=calculateCentralPoint(coordinations)
         updateDistances(central_point_lon,central_point_lat)
         processDistances()

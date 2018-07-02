@@ -144,7 +144,7 @@ def calculateShopNumber():
 
 #read word, coordination file and save values in the list
 word_coor_list=[]
-with open('/Users/mac/Documents/Dissertation/testDocument/bru.csv','rb') as csv_word_coor:
+with open('/Users/mac/Documents/Dissertation/testDocument/cob.csv','rb') as csv_word_coor:
     reader_word_coors = csv.DictReader(csv_word_coor,delimiter=',')
     for word_coors in reader_word_coors:
         word_coor_dict={}
@@ -301,7 +301,7 @@ print('after filter')
 else:
     r_distance=distances[0]'''
 
-if filter_number!=0:
+if filter_number!=0 and len(set(coordinations))>3:
     coor_distances = sorted(coor_distances, key=lambda coor_distances: coor_distances['distance'], reverse = True)
     del coor_distances[0:int(filter_number)]
     print coor_distances
@@ -312,6 +312,7 @@ if filter_number!=0:
     processDistances()
     r_distance=distances[0]
 else:
+    processDistances()
     r_distance=distances[0]
 
 print r_distance
