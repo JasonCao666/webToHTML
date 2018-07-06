@@ -6,6 +6,9 @@ import os
 import pandas as pd
 from HTMLParser import HTMLParser
 import nltk
+from nltk.stem import PorterStemmer
+from nltk.tokenize import sent_tokenize, word_tokenize
+
 reload(sys)
 sys.setdefaultencoding('utf8')
 csv.field_size_limit(500 * 1024 * 1024)
@@ -146,6 +149,21 @@ for input_row in input_list:
 
 re_encode=re.compile(r'\\([a-zA-Z0-9]){3}')  
 filted_result_list =  eval(re_encode.sub('',str(filted_result_list)))
+
+ps = PorterStemmer()
+
+for filt_list_row in filted_result_list:
+    if filt_list_row[2]!='':
+        diff=  len(filt_list_row[2])-len(ps.stem(filt_list_row[2]))
+        a,b= nltk.pos_tag([filt_list_row[2]])[0]
+        matchNN = re.match( r'NNS', b)
+        if diff<3 and matchNN:
+            if filt_list_row[2][len(ps.stem(filt_list_row[2])):len(filt_list_row[2])] == 's' or filt_list_row[2][len(ps.stem(filt_list_row[2])):len(filt_list_row[2])]=='es':
+                filt_list_row[2]=filt_list_row[2][0:len(ps.stem(filt_list_row[2]))]
+        else:
+            continue
+
+
 '''for i in range(len(filted_result_list)):
     if filted_result_list[i][2]!='':
         a,b= nltk.pos_tag([filted_result_list[i][2]])[0]
