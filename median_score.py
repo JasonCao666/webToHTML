@@ -12,6 +12,8 @@ with open('/Users/mac/Documents/Dissertation/documents/word_city_small_larger_md
 word_feature_list=sorted(word_feature_list, key=lambda word_feature: word_feature[1], reverse = True)
 
 
+
+
 word_feature_list
 
 
