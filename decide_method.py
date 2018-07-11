@@ -16,11 +16,13 @@ global distances
 global city_shop_number
 global original_central_lon
 global original_central_lat
+global word_distance_shop_number
 coor_distances=[]
 coordinations=[]
 distances=[]
 city_shop_number=[]
 previous_coordinations=[]
+word_distance_shop_number=[]
 
 #calculate the central point (specified in decimal degrees)
 def center_geolocation(geolocations):
@@ -109,6 +111,21 @@ def calculateShopNumber():
         city_shop_number_dic[item]=previous_coordinations.count(item)
         city_shop_number.append(city_shop_number_dic)
 
+def calculateDistanceAndShopNumber(word):
+    global word_distance_shop_number
+    word_distance_shop_number=[]
+    central_point_lon,central_point_lat=calculateCentralPoint(previous_coordinations)
+    word_distance=[]
+    for word_coor in previous_coordinations:
+        map_p1,map_p2=map(float(word_coor.split(',')[1]),float(word_coor.split(',')[0]))
+        distance=getDistanceBetweenTwoPoints(central_point_lon,central_point_lat,map_p1,map_p2)
+        word_distance.append((word,distance))
+    myset = set(word_distance)
+    for item in myset:
+        shop_number=word_distance.count(item)
+        word_distance_shop_number.append((item[0],item[1],shop_number))
+
+
 #read word, coordination file and save values in the list
 word_coor_list=[]
 with open('/Users/mac/Documents/Dissertation/documents/collection_result.csv','rb') as csv_word_coor:
@@ -142,6 +159,26 @@ for i in range(len(word_coor_list)):
     coordinations=[]
     coordinations = word_coor_list[i]['coordinations'].split()
     previous_coordinations = word_coor_list[i]['coordinations'].split()
+    
+    #calculate ratio-----------
+    calculateDistanceAndShopNumber(word_coor_list[i]['word'])
+    word_distance_shop_number=sorted(word_distance_shop_number, key=lambda distance: distance[1])
+    x=[]
+    y=[]
+    shop_number_sum=0
+    for word_distance_shop_number_row in word_distance_shop_number:
+        shop_number_sum=shop_number_sum+float(word_distance_shop_number_row[2])
+        x.append(word_distance_shop_number_row[1])
+        y.append(shop_number_sum)
+    
+    sum_less=0
+    for distance_shop_number_row in word_distance_shop_number:
+        if distance_shop_number_row[1]<= 200000:
+            sum_less=sum_less+distance_shop_number_row[2]
+    
+    propotion= round(float(sum_less)/float(shop_number_sum),2)
+    #---------------
+
     #print coordinations
     central_point_lon,central_point_lat=calculateCentralPoint(coordinations)
     #print 'before filter central point:'+str(central_point_lon)+' '+str(central_point_lat)
@@ -181,9 +218,8 @@ for i in range(len(word_coor_list)):
             word_score_shops.append(original_central_lon)
             word_score_shops.append(original_central_lat)
             word_score_shops.append(getRadius(central_point_lon,central_point_lat))
+            word_score_shops.append(propotion)
             output_list.append(word_score_shops)
-
-
 
 #if file exist, delete
 output_filename = '/Users/mac/Documents/Dissertation/documents/word_score_shop.csv'
@@ -191,7 +227,7 @@ if os.path.exists(output_filename):
     os.remove(output_filename)
 
 #write result into wordLocation.csv
-headers = ['word', 'distance_centre', 'shop_number', 'word_central_lon', 'word_central_lat','radius']
+headers = ['word', 'distance_centre', 'shop_number', 'word_central_lon', 'word_central_lat','radius','word_ratio']
 with open(output_filename,'wb') as output_file:
     csvWriter = csv.writer(output_file)
     csvWriter.writerow(headers)

@@ -1,6 +1,7 @@
 import csv
 from math import log
 import operator
+import os
 
 def createDataset():
     sample_list=[]
@@ -17,20 +18,26 @@ def createDataset():
                 else:
                     avg_dis='avg_dis<=300000'
                 proportion=round(float(samples['shopNumberLessThanMedian'])/(float(samples['shopNumberLargerThanMedian'])+float(samples['shopNumberLessThanMedian'])),2)
-                if proportion > 0.7:
-                    pro='pro>0.7'
+                
+                if proportion > 0.67:
+                    pro='pro>0.67'
+                    print 'proportion'+str(proportion)
                 else:
-                    pro='pro<=0.7'
+                    pro='pro<=0.67'
                 shopNumber=int(samples['shopNumberLessThanMedian'])+int(samples['shopNumberLargerThanMedian'])
-                if shopNumber>10:
-                    total_num='shop_num>10'
+                if shopNumber>=10:
+                    total_num='shop_num>=10'
                 else:
-                    total_num='shop_num<=10'
-            sample_list.append([city_num,avg_dis,pro,total_num,samples['regional']])
+                    total_num='shop_num<10'
+                if float(samples['word_ratio'])>=0.7:
+                    shop_ratio='shop_ratio>=0.7'
+                else:
+                    shop_ratio='shop_ratio<0.7'
+            sample_list.append([city_num,avg_dis,pro,total_num,shop_ratio, samples['regional']])
         csv_sample_dataset.close
 
 
-    labels = ['cityNumber','avgDistance','proportion','shopNumber']
+    labels = ['cityNumber','avgDistance','proportion','shopNumber','shop_ratio']
     return sample_list,labels
 
 #calculate entropy
@@ -77,7 +84,6 @@ def chooseBestFeatureToSplit(dataSet):
             print 'subDataSet: '+str(subDataSet)
             prob =len(subDataSet)/float(len(dataSet))
             newEntropy +=prob*calcShannonEnt(subDataSet)
-        
         infoGain = baseEntropy - newEntropy
         print 'infoGain: '+str(infoGain)
         if (infoGain>bestInfoGain):
@@ -115,16 +121,13 @@ def createTree(dataSet,labels):
         myTree[bestFeatLabel][value]=createTree(splitDataSet(dataSet,bestFeat,value),subLabels)
     return myTree
 
-
 def classify(tree,label,testVec):
     firstFeat=tree.keys()[0]
     secondDict=tree[firstFeat]
     labelIndex=label.index(firstFeat)
-    classLabel='unknown'
+    classLabel='UN'
     for key in secondDict.keys():
-        
         if testVec[labelIndex]==key:
-            
             if type(secondDict[key]).__name__=='dict':
                 classLabel=classify(secondDict[key],label,testVec)
             else:
@@ -135,8 +138,79 @@ dataSet, labels=createDataset()
 tree=createTree(dataSet, labels)
 print tree
 
+
 #testcode
-tt = dataSet[39]
+testdata_dict={}
+with open('/Users/mac/Documents/Dissertation/documents/word_city_small_larger_md_ad.csv','rb') as csv_test_file:
+    reader_test_dataset = csv.DictReader(csv_test_file,delimiter=',')
+    for test_row in reader_test_dataset:
+        testdata_list=[]
+        if test_row['word']!='':
+            if int(test_row['cityNumber'])>19:
+                city_num='city>19'
+            else:
+                city_num='city<=19'
+            if float(test_row['avgDistance'])>300000:
+                avg_dis='avg_dis>300000'
+            else:
+                avg_dis='avg_dis<=300000'
+            proportion=round(float(test_row['shopNumberLessThanMedian'])/(float(test_row['shopNumberLargerThanMedian'])+float(test_row['shopNumberLessThanMedian'])),2)
+            if proportion > 0.67:
+                pro='pro>0.67'
+            else:
+                pro='pro<=0.67'
+            shopNumber=int(test_row['shopNumberLessThanMedian'])+int(test_row['shopNumberLargerThanMedian'])
+            if shopNumber>=10:
+                total_num='shop_num>=10'
+            else:
+                total_num='shop_num<10'
+            if float(test_row['word_ratio'])>=0.7:
+                shop_ratio='shop_ratio>=0.7'
+            else:
+                shop_ratio='shop_ratio<0.7'
+            testdata_list.append([city_num,avg_dis,pro,total_num,shop_ratio])
+            testdata_dict[test_row['word']]=testdata_list
+    csv_test_file.close
+
+output_list=[]
+for key in testdata_dict:
+    output_list.append((key,classify(tree,['cityNumber','avgDistance','proportion','shopNumber','shop_ratio'],testdata_dict[key][0])))
+
+output_list=sorted(output_list, key=lambda word_judge: word_judge[1])
+
+regional_word_num=0
+wide_word_num=0
+unknown_word_num=0
+for output_row in output_list:
+    if output_row[1]=='Y':
+        regional_word_num=regional_word_num+1
+        print output_row
+    elif output_row[1]=='N':
+        wide_word_num=wide_word_num+1
+        print output_row
+    else:
+        unknown_word_num=unknown_word_num+1
+print 'regional_word_num'+str(regional_word_num)
+print 'wide_word_num'+str(wide_word_num)
+print 'unknown_word_num'+str(unknown_word_num)
+
+
+'''tt = dataSet[39] )
 print classify(tree,['cityNumber','avgDistance','proportion','shopNumber'],tt)
-'''x = classify(tree,tt,labels)
+x = classify(tree,tt,labels)
 print x'''
+
+#if file exist, delete
+'''output_filename = '/Users/mac/Documents/Dissertation/documents/regional_shop_proportion_avgdistance_ratio.csv'
+if os.path.exists(output_filename):
+    os.remove(output_filename)
+
+#write result into wordLocation.csv
+headers = ['word', 'regional']
+with open(output_filename,'wb') as output_file:
+    csvWriter = csv.writer(output_file)
+    csvWriter.writerow(headers)
+    for data in output_list:
+        csvWriter.writerow(data)
+output_file.close'''
+
