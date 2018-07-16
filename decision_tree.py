@@ -25,14 +25,14 @@ def createDataset():
                 else:
                     pro='pro<=0.67'
                 shopNumber=int(samples['shopNumberLessThanMedian'])+int(samples['shopNumberLargerThanMedian'])
-                if shopNumber>=10:
-                    total_num='shop_num>=10'
+                if shopNumber>10:
+                    total_num='shop_num>10'
                 else:
-                    total_num='shop_num<10'
-                if float(samples['word_ratio'])>=0.7:
-                    shop_ratio='shop_ratio>=0.7'
+                    total_num='shop_num<=10'
+                if float(samples['word_ratio'])>=0.65:
+                    shop_ratio='shop_ratio>=0.65'
                 else:
-                    shop_ratio='shop_ratio<0.7'
+                    shop_ratio='shop_ratio<0.65'
             sample_list.append([city_num,avg_dis,pro,total_num,shop_ratio, samples['regional']])
         csv_sample_dataset.close
 
@@ -125,7 +125,7 @@ def classify(tree,label,testVec):
     firstFeat=tree.keys()[0]
     secondDict=tree[firstFeat]
     labelIndex=label.index(firstFeat)
-    classLabel='UN'
+    classLabel='N'
     for key in secondDict.keys():
         if testVec[labelIndex]==key:
             if type(secondDict[key]).__name__=='dict':
@@ -136,7 +136,7 @@ def classify(tree,label,testVec):
 
 dataSet, labels=createDataset()
 tree=createTree(dataSet, labels)
-print tree
+
 
 
 #testcode
@@ -160,14 +160,14 @@ with open('/Users/mac/Documents/Dissertation/documents/word_city_small_larger_md
             else:
                 pro='pro<=0.67'
             shopNumber=int(test_row['shopNumberLessThanMedian'])+int(test_row['shopNumberLargerThanMedian'])
-            if shopNumber>=10:
-                total_num='shop_num>=10'
+            if shopNumber>10:
+                total_num='shop_num>10'
             else:
-                total_num='shop_num<10'
-            if float(test_row['word_ratio'])>=0.7:
-                shop_ratio='shop_ratio>=0.7'
+                total_num='shop_num<=10'
+            if float(test_row['word_ratio'])>=0.65:
+                shop_ratio='shop_ratio>=0.65'
             else:
-                shop_ratio='shop_ratio<0.7'
+                shop_ratio='shop_ratio<0.65'
             testdata_list.append([city_num,avg_dis,pro,total_num,shop_ratio])
             testdata_dict[test_row['word']]=testdata_list
     csv_test_file.close
@@ -184,7 +184,7 @@ unknown_word_num=0
 for output_row in output_list:
     if output_row[1]=='Y':
         regional_word_num=regional_word_num+1
-        print output_row
+        print output_row[0]
     elif output_row[1]=='N':
         wide_word_num=wide_word_num+1
         print output_row
@@ -194,14 +194,14 @@ print 'regional_word_num'+str(regional_word_num)
 print 'wide_word_num'+str(wide_word_num)
 print 'unknown_word_num'+str(unknown_word_num)
 
-
+print tree
 '''tt = dataSet[39] )
 print classify(tree,['cityNumber','avgDistance','proportion','shopNumber'],tt)
 x = classify(tree,tt,labels)
 print x'''
 
 #if file exist, delete
-'''output_filename = '/Users/mac/Documents/Dissertation/documents/regional_shop_proportion_avgdistance_ratio.csv'
+output_filename = '/Users/mac/Documents/Dissertation/documents/regional_result_ratio.csv'
 if os.path.exists(output_filename):
     os.remove(output_filename)
 
@@ -212,5 +212,5 @@ with open(output_filename,'wb') as output_file:
     csvWriter.writerow(headers)
     for data in output_list:
         csvWriter.writerow(data)
-output_file.close'''
+output_file.close
 

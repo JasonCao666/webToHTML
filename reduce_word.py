@@ -44,7 +44,8 @@ current_id=''
 current_word=''
 word_and_location={}
 ids=[]
-input_file='/Users/mac/Documents/Dissertation/documents/wordLocationSorted.csv'
+#input_file='/Users/mac/Documents/Dissertation/documents/wordLocationSorted.csv'
+input_file='/Users/mac/Documents/Dissertation/documents/wordPairLocationSorted.csv'
 #input_file='/Users/mac/Documents/Dissertation/testDocument/wordLocationTest.csv'
 removeBom(input_file)
 with open(input_file,'rb') as csv_HTML:
@@ -73,7 +74,7 @@ with open(input_file,'rb') as csv_HTML:
                     word_and_location[file_row['word']]=str(file_row['coordination'])+' '
 
 #print word_and_location
-output_file_name='/Users/mac/Documents/Dissertation/documents/collection_result.csv'
+output_file_name='/Users/mac/Documents/Dissertation/documents/wordPair_collection_result.csv'
 #output_file_name='/Users/mac/Documents/Dissertation/testDocument/collection_result.csv'
 
 if os.path.exists(output_file_name):
