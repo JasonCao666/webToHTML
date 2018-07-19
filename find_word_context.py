@@ -171,7 +171,7 @@ for word in words:
 
 '''f_word_context_list = open('/Users/mac/Documents/Dissertation/documents/word_context_list.txt')
 word_context_list = f_word_context_list.read()
-f_word_context_list.close'''
+f_word_context_list.close
 
 re_tag1=re.compile(r'"')
 word_context_list=re_tag1.sub('',word_context_list)
@@ -182,7 +182,7 @@ word_context_list=re_encode.sub('',word_context_list)
 re_newline = re.compile('\n')
 word_context_list=re_newline.sub('',word_context_list)
 
-word_context_list = eval(word_context_list)
+word_context_list = eval(word_context_list)'''
 
 #if file exist, delete
 output_filename = '/Users/mac/Documents/Dissertation/documents/regional_word_context_ratio.csv'
@@ -194,7 +194,7 @@ headers = ['word', 'context', 'shop_id']
 with open(output_filename,'wb') as output_file:
     csvWriter = csv.writer(output_file)
     csvWriter.writerow(headers)
-    for data in word_context_list:
+    for data in context_result_list:
         csvWriter.writerow(data)
 output_file.close
 

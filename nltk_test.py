@@ -46,12 +46,30 @@ for input_list_row in example:
 #print nltk.pos_tag([input_list_row])
 #print nltk.pos_tag(input_list_row)
 
-nlp = spacy.load('en')
-str='Natural language processing (NLP) deals with the application of computational models to text or speech data. Application areas within NLP include automatic (machine) translation between languages; dialogue systems, which allow a human to interact with a machine using natural language; and information extraction, where the goal is to transform unstructured text into structured (database) representations that can be searched and browsed in flexible ways. NLP technologies are having a dramatic impact on the way people interact with computers, on the way people interact with each other through the use of language, and on the way people access the vast amount of linguistic data now in electronic form. From a scientific viewpoint, NLP involves fundamental questions of how to structure formal models (for example statistical models) of natural language phenomena, and of how to design algorithms that implement these models.'
-test_doc = nlp(u'%s' % (str))
+'''nlp = spacy.load('en')
+string_doc='Natural language processing (NLP) deals with the application of computational models to text or speech data. Application areas within NLP include automatic (machine) translation between languages; dialogue systems, which allow a human to interact with a machine using natural language; and information extraction, where the goal is to transform unstructured text into structured (database) representations that can be searched and browsed in flexible ways. NLP technologies are having a dramatic impact on the way people interact with computers, on the way people interact with each other through the use of language, and on the way people access the vast amount of linguistic data now in electronic form. From a scientific viewpoint, NLP involves fundamental questions of how to structure formal models (for example statistical models) of natural language phenomena, and of how to design algorithms that implement these models.'
 
-for np in test_doc.noun_chunks:
-    print 'np.text: '+np.text
-    print 'np.root.dep_: '+np.root.dep_
-    print 'np.root.head.text: '+np.root.head.text
+test_doc = nlp(u'%s' % (string_doc))
+test_doc2=nlp(u'a splash')
+for np in test_doc2.noun_chunks:
+    print np
+
+new_word=''
+for w in test_doc2:
+    print w
+    print w.pos
+    print w.pos_
+    if w.pos_ =='NOUN':
+            new_word=str(new_word)+str(w)+' '
+new_word=new_word.rstrip()
+print new_word'''
+
+
+'''all_tags = {w.pos: w.pos_ for w in test_doc2}
+print all_tags'''
+
+nlp = spacy.load('en')
+doc1 = nlp(u'chicken wrap')
+doc2 = nlp(u'a inch chicken tikk')
+print doc1.similarity(doc2)
 

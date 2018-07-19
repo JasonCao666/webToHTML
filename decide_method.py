@@ -128,7 +128,7 @@ def calculateDistanceAndShopNumber(word):
 
 #read word, coordination file and save values in the list
 word_coor_list=[]
-with open('/Users/mac/Documents/Dissertation/documents/collection_result.csv','rb') as csv_word_coor:
+with open('/Users/mac/Documents/Dissertation/documents/nounPhase_collection_result.csv','rb') as csv_word_coor:
     reader_word_coors = csv.DictReader(csv_word_coor,delimiter=',')
     for word_coors in reader_word_coors:
         word_coor_dict={}
@@ -222,7 +222,7 @@ for i in range(len(word_coor_list)):
             output_list.append(word_score_shops)
 
 #if file exist, delete
-output_filename = '/Users/mac/Documents/Dissertation/documents/word_score_shop.csv'
+output_filename = '/Users/mac/Documents/Dissertation/documents/nounPhase_score_shop.csv'
 if os.path.exists(output_filename):
     os.remove(output_filename)
 

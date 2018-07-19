@@ -36,7 +36,8 @@ def calculateOpt(raw_list):
 
 #read word, coordination file and save values in the list
 word_score_shop_list=[]
-with open('/Users/mac/Documents/Dissertation/documents/word_score_shop.csv','rb') as csv_word_score_shop:
+    #with open('/Users/mac/Documents/Dissertation/documents/word_score_shop.csv','rb') as csv_word_score_shop:
+with open('/Users/mac/Documents/Dissertation/documents/nounPhase_score_shop.csv','rb') as csv_word_score_shop:
     reader_word_score_shop = csv.DictReader(csv_word_score_shop,delimiter=',')
     for word_score_shop in reader_word_score_shop:
         word_score_shop_dict=[]
@@ -78,7 +79,8 @@ for word in word_set:
 output_list = sorted(output_list, key=lambda output: output[1], reverse = True)
 
 #if file exist, delete
-output_filename = '/Users/mac/Documents/Dissertation/documents/word_city_small_larger_md_ad.csv'
+#output_filename = '/Users/mac/Documents/Dissertation/documents/word_city_small_larger_md_ad.csv'
+output_filename = '/Users/mac/Documents/Dissertation/documents/nounPhase_city_small_larger_md_ad.csv'
 if os.path.exists(output_filename):
     os.remove(output_filename)
 

@@ -103,7 +103,7 @@ class MyHTMLParser(HTMLParser):
                         np=str(np).lstrip()
                         np=np.rstrip()
                         if np!='':
-                            filted_result_list.append((self.id,self.coordination,np))
+                            filted_result_list.append([self.id,self.coordination,np])
                 except Exception,err:
                     print err
 
@@ -142,9 +142,19 @@ loop(input_list)
 re_encode=re.compile(r'\\([a-zA-Z0-9]){3}')
 filted_result_list =  eval(re_encode.sub('',str(filted_result_list)))
 
+'''for i in range(len(filted_result_list)):
+    new_word=''
+    if
+    filter_doc = nlp(u'%s' % (filted_result_list[i][2]))
+    for word in filter_doc:
+        if word.pos_ =='NOUN':
+            new_word=str(new_word)+str(word)+' '
+    new_word=new_word.rstrip()
+    filted_result_list[i][2]=new_word'''
+
 
 #if file exist, delete
-output_filename = '/Users/mac/Documents/Dissertation/documents/wordPairLocation.csv'
+output_filename = '/Users/mac/Documents/Dissertation/documents/nounPhaseLocation.csv'
 #output_filename = '/Users/mac/Documents/Dissertation/testDocument/wordLocation.csv'
 if os.path.exists(output_filename):
     os.remove(output_filename)
