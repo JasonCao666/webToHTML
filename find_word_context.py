@@ -150,7 +150,7 @@ with open(input_filename,'rb') as csv_input:
 csv_input.close
 
 #regional_word_filename='/Users/mac/Documents/Dissertation/documents/regional_result.csv'
-regional_word_filename='/Users/mac/Documents/Dissertation/documents/regional_result_ratio.csv'
+regional_word_filename='/Users/mac/Documents/Dissertation/documents/noun_phrase_context_input.csv'
 words=getWordList(regional_word_filename)
 
 for word in words:
@@ -185,7 +185,7 @@ word_context_list=re_newline.sub('',word_context_list)
 word_context_list = eval(word_context_list)'''
 
 #if file exist, delete
-output_filename = '/Users/mac/Documents/Dissertation/documents/regional_word_context_ratio.csv'
+output_filename = '/Users/mac/Documents/Dissertation/documents/noun_phrase_word_context.csv'
 if os.path.exists(output_filename):
     os.remove(output_filename)
 

@@ -4,6 +4,7 @@ import re
 from nltk.stem import PorterStemmer
 from nltk.tokenize import sent_tokenize, word_tokenize
 import spacy
+import itertools
 
 '''input_list=[]
 input_filename = '/Users/mac/Documents/Dissertation/documents/wordLocation.csv'
@@ -68,8 +69,24 @@ print new_word'''
 '''all_tags = {w.pos: w.pos_ for w in test_doc2}
 print all_tags'''
 
-nlp = spacy.load('en')
+'''nlp = spacy.load('en')
 doc1 = nlp(u'chicken wrap')
 doc2 = nlp(u'a inch chicken tikk')
-print doc1.similarity(doc2)
+print doc1.similarity(doc2)'''
+
+words = ["mama", "papa", "sister", "brother"]
+if len(words)==1:
+    print words
+elif len(words)==2:
+    for i in range(len(words)):
+        if i!=len(words)-1:
+            print str(words[i])+' '+words[i+1]
+            break
+else:
+    for i in range(len(words)):
+        if i!=len(words)-1:
+            print str(words[i])+' '+words[i+1]
+
+'''pairs = list(itertools.product(words, repeat=2))
+print pairs'''
 

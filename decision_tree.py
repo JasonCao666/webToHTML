@@ -33,7 +33,8 @@ def createDataset():
                     shop_ratio='shop_ratio>=0.65'
                 else:
                     shop_ratio='shop_ratio<0.65'
-            sample_list.append([city_num,avg_dis,pro,total_num,shop_ratio, samples['regional']])
+                sample_list.append([city_num,avg_dis,pro,total_num,shop_ratio, samples['regional']])
+    
         csv_sample_dataset.close
 
 
