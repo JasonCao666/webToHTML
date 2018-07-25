@@ -74,6 +74,7 @@ with open('/Users/mac/Documents/Dissertation/documents/nounPhase_city_small_larg
         out_put_list.append([samples['word'],clf.predict([[samples['cityNumber'],float(samples['avgDistance']),proportion,shopNumber,samples['word_ratio']]])[0]])
 csv_predict_dataset.close
 
+
 number_regional=0
 regional_nonu_phrases=[]
 str_word=''
@@ -88,7 +89,7 @@ print str_word
 output_list=sorted(out_put_list, key=lambda word_judge: word_judge[1])
 
 #if file exist, delete
-output_filename = '/Users/mac/Documents/Dissertation/documents/noun_phrase_regional_result.csv'
+output_filename = '/Users/mac/Documents/Dissertation/documents/noun_phrase_pro_regional_result.csv'
 if os.path.exists(output_filename):
     os.remove(output_filename)
 
